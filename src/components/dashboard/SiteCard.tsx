@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/Button";
 import { buttonClasses } from "@/components/ui/button-styles";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { AvailabilityChart } from "@/components/dashboard/AvailabilityChart";
-import { SITE_ROW_GRID } from "@/components/dashboard/site-row-grid";
+import {
+  SITE_ROW_LAST_CHECK_WIDTH,
+  SITE_ROW_RESPONSE_WIDTH,
+  SITE_ROW_STATUS_WIDTH,
+} from "@/components/dashboard/site-row-layout";
 import { formatCheckTimestamp } from "@/lib/format-date";
 import type { SiteRecord } from "@/lib/types";
 
@@ -16,13 +20,13 @@ type SiteCardProps = {
   onDelete: (site: SiteRecord) => void;
 };
 
-// Une carte = 2 lignes : infos + actions (alignées en colonnes, comme un tableau, à partir de md),
+// Une carte = 2 lignes : infos + actions (alignées en colonnes, comme un tableau, à partir de lg),
 // puis le graphique de disponibilité + le bouton de vérification.
 export function SiteCard({ site, checking, onVerify, onEdit, onDelete }: SiteCardProps) {
   return (
     <li className="rounded-xl border border-zinc-800 bg-zinc-900/60 shadow-lg shadow-black/20">
-      <div className={`grid grid-cols-1 gap-3 p-4 sm:p-5 lg:items-center lg:gap-4 ${SITE_ROW_GRID}`}>
-        <div className="min-w-0">
+      <div className="flex flex-col gap-3 p-4 sm:p-5 lg:flex-row lg:items-center lg:gap-4">
+        <div className="min-w-0 lg:flex-1">
           <p className="truncate font-semibold text-zinc-50">{site.name}</p>
           <a
             href={site.url}
@@ -35,21 +39,21 @@ export function SiteCard({ site, checking, onVerify, onEdit, onDelete }: SiteCar
           </a>
         </div>
 
-        <div>
+        <div className={SITE_ROW_STATUS_WIDTH}>
           <StatusBadge status={site.status} />
         </div>
 
-        <div className="text-sm whitespace-nowrap">
+        <div className={`text-sm lg:whitespace-nowrap ${SITE_ROW_RESPONSE_WIDTH}`}>
           <span className="text-zinc-500 lg:hidden">Temps de réponse : </span>
           <span className="text-zinc-200">{site.responseTime !== null ? `${site.responseTime} ms` : "—"}</span>
         </div>
 
-        <div className="text-sm whitespace-nowrap">
+        <div className={`text-sm lg:whitespace-nowrap ${SITE_ROW_LAST_CHECK_WIDTH}`}>
           <span className="text-zinc-500 lg:hidden">Dernière vérification : </span>
           <span className="text-zinc-200">{formatCheckTimestamp(site.lastCheck)}</span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+        <div className="flex flex-wrap items-center gap-2 lg:shrink-0 lg:justify-end">
           <Link href={`/sites/${site.id}`} className={buttonClasses("outline")}>
             <Eye className="h-4 w-4" aria-hidden="true" />
             Détails

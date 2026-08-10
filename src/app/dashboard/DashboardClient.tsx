@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/Button";
 import { SiteCard } from "@/components/dashboard/SiteCard";
 import { SiteFormModal } from "@/components/dashboard/SiteFormModal";
 import { ConfirmDeleteDialog } from "@/components/dashboard/ConfirmDeleteDialog";
-import { SITE_ROW_GRID } from "@/components/dashboard/site-row-grid";
+import {
+  SITE_ROW_LAST_CHECK_WIDTH,
+  SITE_ROW_RESPONSE_WIDTH,
+  SITE_ROW_STATUS_WIDTH,
+} from "@/components/dashboard/site-row-layout";
 import type { SiteRecord } from "@/lib/types";
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -111,7 +115,7 @@ export function DashboardClient() {
 
   return (
     <>
-      <main className="mx-auto max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-col gap-4">
           <div>
             <h1 className="text-xl font-semibold text-zinc-50">Sites surveillés</h1>
@@ -196,13 +200,11 @@ export function DashboardClient() {
           </div>
         ) : (
           <>
-            <div
-              className={`hidden gap-4 px-4 pb-2 text-xs font-medium tracking-wide text-zinc-500 uppercase sm:px-5 lg:grid ${SITE_ROW_GRID}`}
-            >
-              <span>Site</span>
-              <span>Statut</span>
-              <span>Temps de réponse</span>
-              <span>Dernière vérification</span>
+            <div className="hidden gap-4 px-4 pb-2 text-xs font-medium tracking-wide text-zinc-500 uppercase sm:px-5 lg:flex">
+              <span className="lg:flex-1">Site</span>
+              <span className={SITE_ROW_STATUS_WIDTH}>Statut</span>
+              <span className={SITE_ROW_RESPONSE_WIDTH}>Temps de réponse</span>
+              <span className={SITE_ROW_LAST_CHECK_WIDTH}>Dernière vérification</span>
               <span className="text-right">Actions</span>
             </div>
 

@@ -1,6 +1,6 @@
 import type { RecentCheck } from "@/lib/types";
 
-const MAX_BARS = 60;
+const DEFAULT_MAX_BARS = 50;
 const MAX_BAR_HEIGHT = 35;
 const MIN_BAR_HEIGHT = 10;
 // En dessous de ce temps de réponse, la barre est à sa hauteur max ; au-dessus, à sa hauteur min.
@@ -25,27 +25,32 @@ function getBarColor(status: string | undefined): string {
 type AvailabilityChartProps = {
   // Du plus récent au plus ancien, comme renvoyé par l'API
   checks: RecentCheck[];
+  // Nombre de créneaux affichés (60 sur le dashboard, 100 sur la page de détails d'un site)
+  maxBars?: number;
 };
 
-// Graphique de disponibilité : 60 créneaux, du plus ancien (gauche) au plus récent (droite).
-// Complété à gauche par des créneaux "pas vérifié" si l'historique compte moins de 60 entrées.
-export function AvailabilityChart({ checks }: AvailabilityChartProps) {
+// Graphique de disponibilité réutilisable : `maxBars` créneaux, du plus ancien (gauche) au plus
+// récent (droite). Complété à gauche par des créneaux "pas vérifié" si l'historique est plus court.
+// Le conteneur est en `overflow-hidden` avec les barres plaquées à droite (justify-end) : sur un
+// écran étroit qui n'a pas la place pour tous les créneaux, ce sont les plus anciens (à gauche)
+// qui disparaissent et les plus récents restent toujours visibles — pas de défilement horizontal.
+export function AvailabilityChart({ checks, maxBars = DEFAULT_MAX_BARS }: AvailabilityChartProps) {
   const chronological = [...checks].reverse();
-  const missingSlots = Math.max(0, MAX_BARS - chronological.length);
+  const missingSlots = Math.max(0, maxBars - chronological.length);
   const bars: Array<RecentCheck | null> = [
     ...Array.from({ length: missingSlots }, () => null),
     ...chronological,
-  ].slice(-MAX_BARS);
+  ].slice(-maxBars);
 
   const onlineCount = checks.filter((check) => check.status === "online").length;
   const offlineCount = checks.filter((check) => check.status === "offline").length;
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full min-w-0 overflow-hidden">
       <div
         role="img"
-        aria-label={`Disponibilité sur les 60 dernières vérifications : ${onlineCount} en ligne, ${offlineCount} hors ligne`}
-        className="flex h-10 w-max items-end gap-0.5"
+        aria-label={`Disponibilité sur les ${maxBars} dernières vérifications : ${onlineCount} en ligne, ${offlineCount} hors ligne`}
+        className="flex h-10 items-end justify-end gap-0.5"
       >
         {bars.map((check, index) => (
           <span
