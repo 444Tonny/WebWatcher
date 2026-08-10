@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { toErrorResponse } from "@/lib/api-response";
 import { parseCreateSiteInput } from "@/lib/site-input";
 
+// Nombre de vérifications récentes renvoyées avec chaque site (utilisé par le graphique de disponibilité)
+const RECENT_CHECKS_LIMIT = 60;
+
 // GET /api/sites — liste les sites, avec recherche optionnelle sur le nom ou l'URL (?search=xxx)
 export async function GET(request: NextRequest) {
   try {
@@ -18,6 +21,13 @@ export async function GET(request: NextRequest) {
           }
         : undefined,
       orderBy: { createdAt: "desc" },
+      include: {
+        checks: {
+          orderBy: { timestamp: "desc" },
+          take: RECENT_CHECKS_LIMIT,
+          select: { status: true, responseTime: true, timestamp: true },
+        },
+      },
     });
 
     return NextResponse.json(sites);
