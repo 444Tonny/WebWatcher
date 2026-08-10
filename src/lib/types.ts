@@ -34,3 +34,11 @@ export type CheckHistoryPage = {
   totalCount: number;
   totalPages: number;
 };
+
+export type SettingsRecord = {
+  id: string;
+  checkInterval: number;
+  notifyOnError: boolean;
+  telegramChatIds: string[];
+  updatedAt: string;
+};

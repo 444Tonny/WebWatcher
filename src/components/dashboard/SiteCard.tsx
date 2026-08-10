@@ -4,11 +4,6 @@ import { Button } from "@/components/ui/Button";
 import { buttonClasses } from "@/components/ui/button-styles";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { AvailabilityChart } from "@/components/dashboard/AvailabilityChart";
-import {
-  SITE_ROW_LAST_CHECK_WIDTH,
-  SITE_ROW_RESPONSE_WIDTH,
-  SITE_ROW_STATUS_WIDTH,
-} from "@/components/dashboard/site-row-layout";
 import { formatCheckTimestamp } from "@/lib/format-date";
 import type { SiteRecord } from "@/lib/types";
 
@@ -39,16 +34,16 @@ export function SiteCard({ site, checking, onVerify, onEdit, onDelete }: SiteCar
           </a>
         </div>
 
-        <div className={SITE_ROW_STATUS_WIDTH}>
+        <div className="lg:w-26 lg:shrink-0">
           <StatusBadge status={site.status} />
         </div>
 
-        <div className={`text-sm lg:whitespace-nowrap ${SITE_ROW_RESPONSE_WIDTH}`}>
+        <div className="text-sm lg:w-22 lg:shrink-0 lg:whitespace-nowrap">
           <span className="text-zinc-500 lg:hidden">Temps de réponse : </span>
           <span className="text-zinc-200">{site.responseTime !== null ? `${site.responseTime} ms` : "—"}</span>
         </div>
 
-        <div className={`text-sm lg:whitespace-nowrap ${SITE_ROW_LAST_CHECK_WIDTH}`}>
+        <div className="text-sm lg:w-50 lg:shrink-0 lg:whitespace-nowrap">
           <span className="text-zinc-500 lg:hidden">Dernière vérification : </span>
           <span className="text-zinc-200">{formatCheckTimestamp(site.lastCheck)}</span>
         </div>
