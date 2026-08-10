@@ -72,7 +72,7 @@ export function CheckHistoryList({ siteId }: CheckHistoryListProps) {
     <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5">
       <ul className={`flex flex-col transition-opacity ${loading ? "opacity-60" : ""}`}>
         {data.checks.map((check) => (
-          <li key={check.id} className="flex flex-col gap-2 border-b border-zinc-800/80 py-3 last:border-b-0">
+          <li key={check.id} className="flex flex-col gap-6 border-b border-zinc-800/80 pt-6 pb-6 last:border-b-0">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-sm whitespace-nowrap text-zinc-200 sm:w-44 sm:shrink-0">
                 {formatCheckTimestamp(check.timestamp)}

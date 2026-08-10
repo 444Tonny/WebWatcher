@@ -67,10 +67,12 @@ export function SiteCard({ site, checking, onVerify, onEdit, onDelete }: SiteCar
       </div>
 
       <div className="flex flex-col gap-3 border-t border-zinc-800/80 px-4 py-3 sm:px-5 sm:flex-row sm:items-center sm:justify-between">
-        <AvailabilityChart checks={site.checks} />
+        
         <Button variant="secondary" icon={RefreshCw} loading={checking} onClick={() => onVerify(site)}>
           Vérifier
         </Button>
+
+        <AvailabilityChart checks={site.checks} />
       </div>
     </li>
   );

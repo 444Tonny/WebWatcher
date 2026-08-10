@@ -6,11 +6,6 @@ import { Button } from "@/components/ui/Button";
 import { SiteCard } from "@/components/dashboard/SiteCard";
 import { SiteFormModal } from "@/components/dashboard/SiteFormModal";
 import { ConfirmDeleteDialog } from "@/components/dashboard/ConfirmDeleteDialog";
-import {
-  SITE_ROW_LAST_CHECK_WIDTH,
-  SITE_ROW_RESPONSE_WIDTH,
-  SITE_ROW_STATUS_WIDTH,
-} from "@/components/dashboard/site-row-layout";
 import type { SiteRecord } from "@/lib/types";
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -200,12 +195,12 @@ export function DashboardClient() {
           </div>
         ) : (
           <>
-            <div className="hidden gap-4 px-4 pb-2 text-xs font-medium tracking-wide text-zinc-500 uppercase sm:px-5 lg:flex">
-              <span className="lg:flex-1">Site</span>
-              <span className={SITE_ROW_STATUS_WIDTH}>Statut</span>
-              <span className={SITE_ROW_RESPONSE_WIDTH}>Temps de réponse</span>
-              <span className={SITE_ROW_LAST_CHECK_WIDTH}>Dernière vérification</span>
-              <span className="text-right">Actions</span>
+            <div className="hidden gap-4 pt-12 px-4 pb-4 text-xs font-medium tracking-wide text-zinc-500 uppercase sm:px-5 lg:flex">
+              <span className="lg:w-86 lg:shrink-0">Site</span>
+              <span className="lg:w-20 lg:shrink-0">Statut</span>
+              <span className="lg:w-22 lg:shrink-0">Réponse</span>
+              <span className="lg:w-50 lg:shrink-0">Dernière vérification</span>
+              <span className="lg:w-32 lg:shrink-0 text-right">Actions</span>
             </div>
 
             <ul className={`flex flex-col gap-4 transition-opacity ${refreshing ? "opacity-70" : ""}`}>

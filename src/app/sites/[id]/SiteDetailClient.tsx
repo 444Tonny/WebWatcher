@@ -20,7 +20,7 @@ const CHART_MAX_BARS = 100;
 function InfoField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex min-w-[45%] flex-col gap-1 sm:min-w-40">
-      <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase">{label}</span>
+      <span className="text-xs font-medium tracking-wide text-zinc-500 uppercase pb-2">{label}</span>
       <div className="text-sm text-zinc-200">{children}</div>
     </div>
   );
@@ -59,7 +59,7 @@ export function SiteDetailClient({ siteId }: SiteDetailClientProps) {
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-100"
+        className="inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-100 pt-2 pb-6"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         Retour au dashboard
@@ -99,7 +99,7 @@ export function SiteDetailClient({ siteId }: SiteDetailClientProps) {
             </Button>
           </div>
 
-          <section className="mt-6 flex flex-wrap gap-6 rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
+          <section className="mt-6 flex flex-wrap gap-6 justify-between rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">
             <InfoField label="Statut">
               <StatusBadge status={site.status} />
             </InfoField>
