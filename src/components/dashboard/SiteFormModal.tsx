@@ -40,6 +40,13 @@ export function SiteFormModal({ site, onClose, onSuccess }: SiteFormModalProps) 
         throw new Error(body?.error ?? "Something went wrong. Please try again.");
       }
 
+      if (!isEdit) {
+        const created = await response.json();
+        // Vérification initiale du site à la création, en best-effort : un échec ici ne doit pas
+        // faire échouer la création elle-même (le site existe déjà et sera vérifié plus tard).
+        await fetch(`/api/cron?siteId=${created.id}`, { method: "POST" }).catch(() => {});
+      }
+
       onSuccess();
       onClose();
     } catch (err) {

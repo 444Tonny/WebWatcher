@@ -6,12 +6,24 @@ import { HttpError } from "@/lib/http-error";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
+// Nombre de vérifications récentes renvoyées avec le site (graphique de disponibilité de la page détails)
+const RECENT_CHECKS_LIMIT = 100;
+
 // GET /api/sites/[id] — récupère un site précis
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
 
-    const site = await prisma.site.findUnique({ where: { id } });
+    const site = await prisma.site.findUnique({
+      where: { id },
+      include: {
+        checks: {
+          orderBy: { timestamp: "desc" },
+          take: RECENT_CHECKS_LIMIT,
+          select: { status: true, responseTime: true, timestamp: true },
+        },
+      },
+    });
     if (!site) {
       throw new HttpError(404, "Site not found");
     }
