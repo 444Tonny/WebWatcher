@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WebWatcher
+
+Application de surveillance de sites web développée avec **Next.js, TypeScript, Tailwind CSS, Prisma 7 et PostgreSQL (Supabase)**.
+
+Pour chaque site suivi : statut (Online/Offline), temps de réponse, dernière vérification, historique complet des vérifications, et détail des erreurs rencontrées.
+
+## Fonctionnalités
+
+- **`/`** — Page d'accueil (mini landing page, CTA vers le dashboard).
+- **`/dashboard`** — Liste des sites (recherche, ajout, modification, suppression), graphique de disponibilité (50 dernières vérifications), vérification manuelle d'un site ou de tous.
+- **`/sites/[id]`** — Détails d'un site : infos générales, graphique de disponibilité (100 dernières vérifications), historique paginé (30/page) avec le détail complet de chaque erreur.
+- **`/settings`** — Fréquence de vérification (1/5/15/30 min) et notifications Telegram (activer/désactiver, gestion des Chat IDs) ; sauvegarde immédiate, pas de bouton "Enregistrer".
+
+## Fonctionnement
+
+Chaque site (`Site`) peut être vérifié manuellement, et l'ensemble des sites est vérifié périodiquement (fréquence configurée dans `/settings`, déclenchée par n8n — voir plus bas).
+
+Chaque vérification crée un `CheckResult` et met à jour le site correspondant. En cas d'échec, un `SiteError` est créé avec le type d'erreur détecté (`lib/checkSite.ts`) :
+
+- `timeout`
+- `dns`
+- `ssl`
+- `connection`
+- `http`
+- `unknown` (avec message d'erreur détaillé)
+
+## Architecture
+
+| Chemin | Rôle |
+| --- | --- |
+| `/` | Page d'accueil |
+| `/dashboard` | Liste et gestion des sites |
+| `/sites/[id]` | Détails et historique d'un site |
+| `/settings` | Fréquence de vérification et configuration Telegram |
+| `/api/sites`, `/api/sites/[id]` | CRUD des sites |
+| `/api/sites/[id]/checks` | Historique paginé des vérifications d'un site |
+| `/api/cron` | Déclenche les vérifications (voir n8n) |
+| `/api/settings` | Lecture/écriture des réglages globaux |
+| `lib/checkSite.ts` | Logique de vérification d'un site |
+| `lib/site-monitoring.ts` | Sélection des sites à vérifier + persistance des résultats |
+| `components/` | Composants réutilisables |
+
+## Automatisation (n8n)
+
+Les vérifications automatiques et les notifications sont gérées par **n8n**, pas par une tâche cron côté serveur :
+
+```
+Schedule Trigger → POST /api/cron?force=true
+                 → si un site repasse "offline" et que GET /api/settings a notifyOnError = true
+                 → Telegram (un message par Chat ID dans telegramChatIds)
+```
+
+`/api/cron` accepte aussi `GET`/`POST` sans paramètre (uniquement les sites dont l'intervalle est dépassé) ou `?siteId=xxx` (un seul site, immédiat).
+
+L'application ne communique **jamais** directement avec Telegram et ne contient aucun bot token : celui-ci reste dans les credentials n8n. Les Chat IDs destinataires sont configurables dans `/settings`.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Base de données
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npx prisma generate     # génère le client Prisma
+npx prisma migrate dev  # applique les migrations
+npx prisma db seed      # seed la base (5 sites d'exemple)
+```
 
-## Learn More
+Variables d'environnement nécessaires (voir `.env`) : `DATABASE_URL` (connexion **pooler** Supabase — le endpoint direct `db.<ref>.supabase.co` est IPv6-only et ne fonctionne pas sur tous les réseaux), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
-To learn more about Next.js, take a look at the following resources:
+### QA
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+La commande Claude Code `/qa` (voir `.claude/commands/qa.md`) fait une passe de QA complète : build, typecheck, lint, puis parcours de toutes les pages dans un vrai navigateur (CRUD, responsive, erreurs console).

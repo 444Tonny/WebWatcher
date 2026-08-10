@@ -5,9 +5,61 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  output   = "../src/app/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Site {
+  id           String        @id @default(cuid())
+  name         String
+  url          String        @unique
+  status       String        @default("unknown")
+  responseTime Int?
+  lastCheck    DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  checks       CheckResult[]
+  errors       SiteError[]
+
+  @@index([status])
+  @@index([lastCheck])
+}
+
+model CheckResult {
+  id           String     @id @default(cuid())
+  siteId       String
+  timestamp    DateTime   @default(now())
+  status       String
+  responseTime Int?
+  httpCode     Int?
+  site         Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  error        SiteError?
+
+  @@index([siteId])
+  @@index([timestamp])
+}
+
+model SiteError {
+  id        String      @id @default(cuid())
+  checkId   String      @unique
+  siteId    String
+  type      String
+  message   String
+  timestamp DateTime    @default(now())
+  check     CheckResult @relation(fields: [checkId], references: [id], onDelete: Cascade)
+  site      Site        @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+  @@index([type])
+}
+
+model Settings {
+  id              String   @id @default("global")
+  checkInterval   Int      @default(300)
+  updatedAt       DateTime @updatedAt
+  notifyOnError   Boolean  @default(false)
+  telegramChatIds String[] @default([])
 }
